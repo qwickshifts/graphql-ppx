@@ -24,11 +24,11 @@ install: ## Install development dependencies
 
 .PHONY: build
 build: ## Build the project
-	$(DUNE) build @main
+	$(DUNE) build
 
 .PHONY: watch
 watch: ## Watch for the filesystem and rebuild on every change
-	$(DUNE) build --watch @main
+	$(DUNE) build --watch
 
 .PHONY: format
 format: ## Format the codebase with ocamlformat
