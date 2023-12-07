@@ -11,9 +11,11 @@
 
 (license MIT)
 
-(maintainers "Jaap Frolich <jfrolich@gmail.com>, Tomasz Cichocinski <tomaszcichocinski@gmail.com>")
+(maintainers
+ "Jaap Frolich <jfrolich@gmail.com>, Tomasz Cichocinski <tomaszcichocinski@gmail.com>")
 
-(authors "Jaap Frolich <jfrolich@gmail.com>, Tomasz Cichocinski <tomaszcichocinski@gmail.com>")
+(authors
+ "Jaap Frolich <jfrolich@gmail.com>, Tomasz Cichocinski <tomaszcichocinski@gmail.com>")
 
 (homepage https://github.com/reasonml-community/graphql-ppx)
 
@@ -39,4 +41,5 @@
    (>= 3.10.0))
   ocaml-lsp-server
   ocamlformat
-  opam-check-npm-deps))
+  opam-check-npm-deps
+  result))
