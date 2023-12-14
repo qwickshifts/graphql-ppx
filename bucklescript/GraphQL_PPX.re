@@ -7,12 +7,12 @@ let rec deepMerge = (json1: Js.Json.t, json2: Js.Json.t) => {
   switch (
     (
       Obj.magic(json1) == Js.null,
-      Js_array2.isArray(json1),
+      Js.Array2.isArray(json1),
       Js.typeof(json1) == "object",
     ),
     (
       Obj.magic(json2) == Js.null,
-      Js_array2.isArray(json2),
+      Js.Array2.isArray(json2),
       Js.typeof(json2) == "object",
     ),
   ) {
