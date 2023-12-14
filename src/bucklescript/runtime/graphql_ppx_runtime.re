@@ -1,60 +1,51 @@
-let option_map = (f, o) => {
-  switch (o) {
-  | Some(x) => Some(f(x))
-  | None => None
-  };
-};
-let rec merge_pairs =
-        (
-          pairs1: list((string, Yojson.Basic.t)),
-          pairs2: list((string, Yojson.Basic.t)),
-        ) => {
-  let unique_keys =
-    List.append(
-      List.map(((k, _)) => k, pairs1),
-      List.map(((k, _)) => k, pairs2),
+let assign_typename: (Js.Json.t, string) => Js.Json.t = (
+  [%raw {| (obj, typename) => { obj.__typename = typename; return obj } |}]:
+    (Js.Json.t, string) => Js.Json.t
+);
+
+let%private clone: Js.Dict.t('a) => Js.Dict.t('a) =
+  a => Obj.magic(Js.Obj.assign(Obj.magic(Js.Obj.empty()), Obj.magic(a)));
+
+let rec deepMerge = (json1: Js.Json.t, json2: Js.Json.t) =>
+  switch (
+    (
+      Obj.magic(json1) == Js.null,
+      Js.Array2.isArray(json1),
+      Js.typeof(json1) == "object",
+    ),
+    (
+      Obj.magic(json2) == Js.null,
+      Js.Array2.isArray(json2),
+      Js.typeof(json2) == "object",
+    ),
+  ) {
+  | ((_, true, _), (_, true, _)) => (
+      Obj.magic(
+        Js.Array2.mapi(
+          Obj.magic(json1),
+          (el1, idx) => {
+            let el2 = Js.Array2.unsafe_get(Obj.magic(json2), idx);
+            Js.typeof(el2) == "object" ? deepMerge(el1, el2) : el2;
+          },
+        ),
+      ): Js.Json.t
     )
-    |> List.fold_left(
-         (unique_keys, key) =>
-           if (List.exists(k => k == key, unique_keys)) {
-             [key, ...unique_keys];
-           } else {
-             unique_keys;
-           },
-         [],
-       );
-
-  unique_keys
-  |> List.map(key => {
-       (
-         key,
-         switch (
-           List.find_opt(((assoc_key, _)) => key == assoc_key, pairs1)
-           |> option_map(pair => snd(pair)),
-           List.find_opt(((assoc_key, _)) => key == assoc_key, pairs2)
-           |> option_map(pair => snd(pair)),
-         ) {
-         | (Some(`Assoc(pairs1)), Some(`Assoc(pairs2))) =>
-           `Assoc(merge_pairs(pairs1, pairs2))
-         | (_, Some(`Assoc(pairs2))) => `Assoc(pairs2)
-         | (_, Some(any)) => any
-         | (Some(any), _) => any
-         | (None, None) => assert(false)
-         },
-       )
-     });
-}
-
-and deepMerge = (json1: Yojson.Basic.t, json2: Yojson.Basic.t) => {
-  switch (json1, json2) {
-  | (`Assoc(pairs1), `Assoc(pairs2)) =>
-    `Assoc(merge_pairs(pairs1, pairs2))
-  | (_, `Bool(value)) => `Bool(value)
-  | (_, `Float(value)) => `Float(value)
-  | (_, `String(value)) => `String(value)
-  | (_, `List(values)) => `List(values)
-  | (_, `Int(value)) => `Int(value)
-  | (_, `Null) => `Null
-  | (_, _) => assert(false)
+  | ((false, false, true), (false, false, true)) =>
+    let obj1 = clone(Obj.magic(json1));
+    let obj2 = Obj.magic(json2);
+    Js.Array2.forEach(
+      Js.Dict.keys(obj2),
+      key => {
+        let existingVal: Js.Json.t = Js.Dict.unsafeGet(obj1, key);
+        let newVal: Js.Json.t = Js.Dict.unsafeGet(obj2, key);
+        Js.Dict.set(
+          obj1,
+          key,
+          Js.typeof(existingVal) != "object"
+            ? newVal : Obj.magic(deepMerge(existingVal, newVal)),
+        );
+      },
+    );
+    Obj.magic(obj1);
+  | ((_, _, _), (_, _, _)) => json2
   };
-};

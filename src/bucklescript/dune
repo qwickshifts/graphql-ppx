@@ -6,4 +6,4 @@
  (flags
   (:standard -w -9))
  (preprocess
-  (pps melange.ppx ppxlib.metaquot)))
+  (pps ppxlib.metaquot)))
