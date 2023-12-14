@@ -331,7 +331,8 @@ let run_validations = (config, definition) => {
       |> List.rev
       |> List.map(((loc, msg)) => {
            let loc = conv_loc(loc);
-           [%stri [%e make_error_expr(loc, msg)]];
+           %stri
+           [%e make_error_expr(loc, msg)];
          }),
     )
   | (None, warnings) =>
@@ -1404,8 +1405,8 @@ let () = {
     args,
   );
   Ppxlib.Driver.register_transformation(
-    ~impl=structure_mapper,
-    ~intf=signature_mapper,
+    ~preprocess_impl=structure_mapper,
+    ~preprocess_intf=signature_mapper,
     "graphql",
   );
 };
