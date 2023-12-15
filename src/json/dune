@@ -3,5 +3,6 @@
 (library
  (name json)
  (public_name graphql_ppx.json)
+ (wrapped false)
  (flags
   (:standard -w -9)))
