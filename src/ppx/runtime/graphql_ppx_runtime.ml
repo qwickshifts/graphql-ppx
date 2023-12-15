@@ -59,19 +59,19 @@ let rec merge_pairs (pairs1 : (string * Json.t) list)
   in
   unique_keys
   |> List.map (fun key ->
-       ( key,
-         match
-           ( List.find_opt (fun (assoc_key, _) -> key = assoc_key) pairs1
-             |> option_map (fun pair -> snd pair),
-             List.find_opt (fun (assoc_key, _) -> key = assoc_key) pairs2
-             |> option_map (fun pair -> snd pair) )
-         with
-         | Some (`Assoc pairs1), Some (`Assoc pairs2) ->
-           `Assoc (merge_pairs pairs1 pairs2)
-         | _, Some (`Assoc pairs2) -> `Assoc pairs2
-         | _, Some any -> any
-         | Some any, _ -> any
-         | None, None -> assert false ))
+         ( key,
+           match
+             ( List.find_opt (fun (assoc_key, _) -> key = assoc_key) pairs1
+               |> option_map (fun pair -> snd pair),
+               List.find_opt (fun (assoc_key, _) -> key = assoc_key) pairs2
+               |> option_map (fun pair -> snd pair) )
+           with
+           | Some (`Assoc pairs1), Some (`Assoc pairs2) ->
+             `Assoc (merge_pairs pairs1 pairs2)
+           | _, Some (`Assoc pairs2) -> `Assoc pairs2
+           | _, Some any -> any
+           | Some any, _ -> any
+           | None, None -> assert false ))
 
 and deepMerge (json1 : Json.t) (json2 : Json.t) =
   match (json1, json2) with
