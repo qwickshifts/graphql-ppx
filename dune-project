@@ -43,3 +43,6 @@
   ocamlformat
   opam-check-npm-deps
   result))
+
+(package
+ (name something_different))
