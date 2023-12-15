@@ -250,15 +250,15 @@ let run_validations config definition =
     Some
       (errs |> List.rev
       |> List.map (fun (loc, msg) ->
-           let loc = conv_loc loc in
-           [%stri [%e make_error_expr loc msg]]))
+             let loc = conv_loc loc in
+             [%stri [%e make_error_expr loc msg]]))
   | None, warnings ->
     warnings
     |> List.iter (fun (loc, message) ->
-         let loc = conv_loc loc in
-         Ocaml_common.Location.print_warning loc
-           !Ocaml_common.Location.formatter_for_warnings
-           (Ocaml_common.Warnings.Preprocessor message));
+           let loc = conv_loc loc in
+           Ocaml_common.Location.print_warning loc
+             !Ocaml_common.Location.formatter_for_warnings
+             (Ocaml_common.Warnings.Preprocessor message));
     None
 
 let rewrite_definition_interface ~(query_config : query_config) ~loc ~delim
@@ -959,13 +959,13 @@ let args =
       Arg.Unit
         (fun () ->
           Ppx_config.update_config (fun current ->
-            { current with verbose_logging = true })),
+              { current with verbose_logging = true })),
       "Defines if logging should be verbose or not" );
     ( "-apollo-mode",
       Arg.Unit
         (fun () ->
           Ppx_config.update_config (fun current ->
-            { current with apollo_mode = true })),
+              { current with apollo_mode = true })),
       "Automatically add __typename everywhere (necessary for apollo)" );
     ( "-schema",
       Arg.String
@@ -976,130 +976,133 @@ let args =
       Arg.Bool
         (fun ast_out ->
           Ppx_config.update_config (fun current ->
-            {
-              current with
-              output_mode =
-                (match ast_out with
-                | true -> Ppx_config.Apollo_AST
-                | false -> Ppx_config.String);
-            })),
+              {
+                current with
+                output_mode =
+                  (match ast_out with
+                  | true -> Ppx_config.Apollo_AST
+                  | false -> Ppx_config.String);
+              })),
       "Defines if output string or AST" );
     ( "-future-added-value",
       Arg.Bool
         (fun future_added_value ->
           Ppx_config.update_config (fun current ->
-            { current with future_added_value })),
+              { current with future_added_value })),
       "Omits the `FutureAddedValue variant for enums if set to false" );
     ( "-verbose-errors",
       Arg.Unit
         (fun () ->
           Ppx_config.update_config (fun current ->
-            { current with verbose_error_handling = true })),
+              { current with verbose_error_handling = true })),
       "Verbose error handling. If not defined NODE_ENV will be used" );
     ( "-template-tag",
       Arg.String
         (fun template_tag ->
           Ppx_config.update_config (fun current ->
-            { current with template_tag = Some template_tag })),
+              { current with template_tag = Some template_tag })),
       "Template tag to use" );
     ( "-template-tag-import",
       Arg.String
         (fun template_tag_import ->
           Ppx_config.update_config (fun current ->
-            { current with template_tag_import = Some template_tag_import })),
+              { current with template_tag_import = Some template_tag_import })),
       "the import to use for the template tag (default is \"default\")" );
     ( "-template-tag-location",
       Arg.String
         (fun template_tag_location ->
           Ppx_config.update_config (fun current ->
-            { current with template_tag_location = Some template_tag_location })),
+              {
+                current with
+                template_tag_location = Some template_tag_location;
+              })),
       "the import location for the template tag" );
     ( "-template-tag-return-type",
       Arg.String
         (fun template_tag_return_type ->
           Ppx_config.update_config (fun current ->
-            {
-              current with
-              template_tag_return_type = Some template_tag_return_type;
-            })),
+              {
+                current with
+                template_tag_return_type = Some template_tag_return_type;
+              })),
       "the import location for the template tag" );
     ( "-fragment-in-query",
       Arg.String
         (function
         | "exclude" ->
           Ppx_config.update_config (fun current ->
-            { current with fragment_in_query = Exclude })
+              { current with fragment_in_query = Exclude })
         | _ ->
           Ppx_config.update_config (fun current ->
-            { current with fragment_in_query = Include })),
+              { current with fragment_in_query = Include })),
       "Include the full fragment in the query (either 'include' or 'exclude')"
     );
     ( "-extend-query",
       Arg.String
         (fun extend_query ->
           Ppx_config.update_config (fun current ->
-            { current with extend_query = Some extend_query })),
+              { current with extend_query = Some extend_query })),
       "extend queries with the following functor" );
     ( "-extend-query-no-required-variables",
       Arg.String
         (fun extend_query_no_required_variables ->
           Ppx_config.update_config (fun current ->
-            {
-              current with
-              extend_query_no_required_variables =
-                Some extend_query_no_required_variables;
-            })),
+              {
+                current with
+                extend_query_no_required_variables =
+                  Some extend_query_no_required_variables;
+              })),
       "extend queries having no required variables with the following functor"
     );
     ( "-extend-mutation",
       Arg.String
         (fun extend_mutation ->
           Ppx_config.update_config (fun current ->
-            { current with extend_mutation = Some extend_mutation })),
+              { current with extend_mutation = Some extend_mutation })),
       "extend mutations with the following functor" );
     ( "-extend-mutation-no-required-variables",
       Arg.String
         (fun extend_mutation_no_required_variables ->
           Ppx_config.update_config (fun current ->
-            {
-              current with
-              extend_mutation_no_required_variables =
-                Some extend_mutation_no_required_variables;
-            })),
+              {
+                current with
+                extend_mutation_no_required_variables =
+                  Some extend_mutation_no_required_variables;
+              })),
       "extend mutations having no required variables with the following functor"
     );
     ( "-extend-subscription",
       Arg.String
         (fun extend_subscription ->
           Ppx_config.update_config (fun current ->
-            { current with extend_subscription = Some extend_subscription })),
+              { current with extend_subscription = Some extend_subscription })),
       "extend subscriptions with the following functor" );
     ( "-extend-subscription-no-required-variables",
       Arg.String
         (fun extend_subscription_no_required_variables ->
           Ppx_config.update_config (fun current ->
-            {
-              current with
-              extend_subscription_no_required_variables =
-                Some extend_subscription_no_required_variables;
-            })),
+              {
+                current with
+                extend_subscription_no_required_variables =
+                  Some extend_subscription_no_required_variables;
+              })),
       "extend subscriptions having no required variables with the following \
        functor" );
     ( "-extend-fragment",
       Arg.String
         (fun extend_fragment ->
           Ppx_config.update_config (fun current ->
-            { current with extend_fragment = Some extend_fragment })),
+              { current with extend_fragment = Some extend_fragment })),
       "extend fragments with the following functor" );
     ( "-native",
       Arg.Unit
         (fun () ->
           Ppx_config.update_config (fun current ->
-            { current with native = true })),
+              { current with native = true })),
       "native mode (non-ReScript)" );
   ]
 
 let () =
   List.iter (fun (k, spec, doc) -> Ppxlib.Driver.add_arg k spec ~doc) args;
-  Ppxlib.Driver.register_transformation ~preprocess_impl:structure_mapper
-    ~preprocess_intf:signature_mapper "graphql"
+  Ppxlib.Driver.register_transformation ~impl:structure_mapper
+    ~intf:signature_mapper "graphql"
