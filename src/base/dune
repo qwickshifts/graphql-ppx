@@ -1,6 +1,7 @@
 (library
  (name graphql_ppx_base)
  (public_name graphql_ppx.base)
+ (wrapped false)
  (libraries unix result yojson ppxlib)
  (flags
   (:standard -w -9))

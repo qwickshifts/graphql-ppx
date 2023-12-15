@@ -11,18 +11,14 @@ let loc = Location.none;
 let make_error_raiser = message =>
   if (Ppx_config.native()) {
     if (Ppx_config.verbose_error_handling()) {
-      %expr
-      raise(Failure("graphql-ppx: " ++ [%e message]));
+      [%expr raise(Failure("graphql-ppx: " ++ [%e message]))];
     } else {
-      %expr
-      raise(Failure("Unexpected GraphQL query response"));
+      [%expr raise(Failure("Unexpected GraphQL query response"))];
     };
   } else if (Ppx_config.verbose_error_handling()) {
-    %expr
-    Js.Exn.raiseError("graphql-ppx: " ++ [%e message]);
+    [%expr Js.Exn.raiseError("graphql-ppx: " ++ [%e message])];
   } else {
-    %expr
-    Js.Exn.raiseError("Unexpected GraphQL query response");
+    [%expr Js.Exn.raiseError("Unexpected GraphQL query response")];
   };
 // duplicate of ouput_bucklescript_decoder
 let const_str_expr = s =>
@@ -957,7 +953,7 @@ let rec generate_arg_type = (~nulls=true, raw, originalLoc) => {
     if (raw) {
       base_type("string");
     } else {
-      Graphql_ppx_base__.Schema.(
+      Graphql_ppx_base.Schema.(
         Ast_helper.(
           Typ.variant(
             ~loc?,
