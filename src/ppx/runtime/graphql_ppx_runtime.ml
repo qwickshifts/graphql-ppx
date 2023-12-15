@@ -1,5 +1,3 @@
-include Json
-
 let option_map f o = match o with Some x -> Some (f x) | None -> None
 
 module Json = struct

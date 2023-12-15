@@ -1,3 +1,5 @@
+include Json
+
 let assign_typename : Js.Json.t -> string -> Js.Json.t =
   [%raw {| (obj, typename) => { obj.__typename = typename; return obj } |}]
 
