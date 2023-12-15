@@ -1,6 +1,0 @@
-(library
- (public_name something_different)
- (name something_different)
- (modes melange)
- (preprocess
-  (pps melange.ppx)))
