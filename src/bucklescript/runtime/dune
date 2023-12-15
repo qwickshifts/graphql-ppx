@@ -1,4 +1,7 @@
 (library
  (public_name graphql_ppx.graphql_ppx_runtime)
  (name graphql_ppx_runtime)
- (libraries yojson))
+ (libraries yojson)
+ (modes melange)
+ (preprocess
+  (pps melange.ppx)))
