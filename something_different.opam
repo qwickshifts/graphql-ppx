@@ -11,6 +11,8 @@ homepage: "https://github.com/reasonml-community/graphql-ppx"
 bug-reports: "https://github.com/reasonml-community/graphql-ppx/issues"
 depends: [
   "dune" {>= "3.8"}
+  "melange" {>= "2.0.0"}
+  "ocaml" {>= "5.1.0"}
   "odoc" {with-doc}
 ]
 build: [

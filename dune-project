@@ -45,4 +45,10 @@
   result))
 
 (package
- (name something_different))
+ (allow_empty)
+ (name something_different)
+ (depends
+  (melange
+   (>= 2.0.0))
+  (ocaml
+   (>= 5.1.0))))
