@@ -1,3 +1,4 @@
 (library
  (public_name graphql_ppx.graphql_ppx_runtime)
- (name graphql_ppx_runtime))
+ (name graphql_ppx_runtime)
+ (modes melange))
