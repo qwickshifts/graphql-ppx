@@ -46,6 +46,3 @@
 
 (package
  (name something_different))
-
-(package
- (name graphql_ppx_runtime))
