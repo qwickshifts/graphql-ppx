@@ -63,6 +63,9 @@ val pretty_to_channel : ?std:bool -> out_channel -> t -> unit
       See [to_string] for the role of the optional [std] argument.
   *)
 
+(* From Util below  *)
+val member : string -> t -> t
+
 module Util : sig
   (**
    This module provides combinators for extracting fields from JSON

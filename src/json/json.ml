@@ -2,6 +2,7 @@
 
 include Json_type
 include Json_common
+include Json_util
 
 module Util = struct
   include Json_util
