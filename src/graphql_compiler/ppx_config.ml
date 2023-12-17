@@ -79,7 +79,7 @@ let extend_subscription_no_required_variables () =
     .extend_subscription_no_required_variables
 
 let extend_fragment () = (!config_ref |> unsafe_unwrap_config).extend_fragment
-let native () = (!config_ref |> unsafe_unwrap_config).native
+let native () = false
 
 let raise_error_with_loc loc message =
   (!config_ref |> unsafe_unwrap_config).raise_error_with_loc loc message
