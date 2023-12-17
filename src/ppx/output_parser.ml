@@ -11,7 +11,7 @@ let conv_loc _ = Location.none
 
 let record_to_object loc record =
   Ast_helper.Exp.extension
-    ({ txt = "bs.obj"; loc = conv_loc loc }, PStr [ [%stri [%e record]] ])
+    ({ txt = "mel.obj"; loc = conv_loc loc }, PStr [ [%stri [%e record]] ])
 
 let raw_opaque_object interface_fragments fields =
   let has_fragments =
@@ -63,8 +63,8 @@ let generate_poly_enum_decoder loc enum_meta omit_future_value =
   let enum_match_arms =
     enum_meta.em_values
     |> List.map (fun { evm_name; _ } ->
-         Ast_helper.Exp.case (const_str_pat evm_name)
-           (Ast_helper.Exp.variant (to_valid_ident evm_name) None))
+           Ast_helper.Exp.case (const_str_pat evm_name)
+             (Ast_helper.Exp.variant (to_valid_ident evm_name) None))
   in
   let fallback_arm =
     match omit_future_value with
@@ -109,12 +109,12 @@ let generate_fragment_parse_fun config loc name arguments definition =
   let labeled_args =
     variable_defs
     |> List.filter (fun (name, _, _, _) ->
-         arguments |> List.exists (fun arg -> arg = name))
+           arguments |> List.exists (fun arg -> arg = name))
     |> List.map (fun (arg_name, type_, _span, type_span) ->
-         ( Labelled arg_name,
-           Ast_helper.Exp.variant
-             ~loc:(config.map_loc type_span |> Output_utils.conv_loc)
-             type_ None ))
+           ( Labelled arg_name,
+             Ast_helper.Exp.variant
+               ~loc:(config.map_loc type_span |> Output_utils.conv_loc)
+               type_ None ))
   in
   Ast_helper.Exp.apply
     ~loc:(loc |> Output_utils.conv_loc)
@@ -179,7 +179,7 @@ and generate_array_decoder config loc inner path definition =
   | false ->
     [%expr
       Js.Array2.map value (fun value ->
-        [%e generate_parser config path definition inner])]
+          [%e generate_parser config path definition inner])]
     [@metaloc loc]
 
 and generate_custom_decoder config loc ident inner path definition =
@@ -384,28 +384,28 @@ and generate_poly_variant_union_decoder config loc _name fragments
   let fragment_cases =
     fragments
     |> List.map (fun (({ item = type_name } : Result_structure.name), inner) ->
-         Ast_helper.Exp.case (const_str_pat type_name)
-           (Ast_helper.Exp.variant type_name
-              (Some
-                 (match config.native with
-                 | true ->
-                   generate_parser config (type_name :: path) definition inner
-                 | false ->
-                   [%expr
-                     let value =
-                       (Obj.magic value
-                         : [%t
-                             match inner with
-                             | Res_solo_fragment_spread { name } ->
-                               base_type_name (name ^ ".Raw.t")
-                             | _ ->
-                               base_type_name
-                                 ("Raw."
-                                 ^ generate_type_name (type_name :: path))])
-                     in
-                     [%e
-                       generate_parser config (type_name :: path) definition
-                         inner]]))))
+           Ast_helper.Exp.case (const_str_pat type_name)
+             (Ast_helper.Exp.variant type_name
+                (Some
+                   (match config.native with
+                   | true ->
+                     generate_parser config (type_name :: path) definition inner
+                   | false ->
+                     [%expr
+                       let value =
+                         (Obj.magic value
+                           : [%t
+                               match inner with
+                               | Res_solo_fragment_spread { name } ->
+                                 base_type_name (name ^ ".Raw.t")
+                               | _ ->
+                                 base_type_name
+                                   ("Raw."
+                                   ^ generate_type_name (type_name :: path))])
+                       in
+                       [%e
+                         generate_parser config (type_name :: path) definition
+                           inner]]))))
   in
   let fallback_case =
     if omit_future_value then
