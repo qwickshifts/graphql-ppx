@@ -188,7 +188,7 @@ let generate_record_type ~config ~obj_path ~raw ~(loc : ast_location)
                  | false ->
                    [
                      Ast_helper.Attr.mk
-                       { txt = "bs.as"; loc = Location.none }
+                       { txt = "mel.as"; loc = Location.none }
                        (PStr [ Ast_helper.Str.eval (const_str_expr name) ]);
                    ])
                {
@@ -247,28 +247,28 @@ let generate_variant_selection ~emit_locations config fields path
         (Ast_helper.Typ.variant
            (fields
            |> List.map (fun ((name : Result_structure.name), res) ->
-                {
-                  prf_desc =
-                    Rtag
-                      ( {
-                          txt = String.capitalize_ascii name.item;
-                          loc = Location.none;
-                        },
-                        false,
-                        [
-                          generate_type
-                            ?atLoc:
-                              (match emit_locations with
-                              | true ->
-                                Some
-                                  (conv_loc
-                                     (config.Generator_utils.map_loc name.span))
-                              | false -> None)
-                            ~config ~path:(name.item :: path) ~raw res;
-                        ] );
-                  prf_loc = Location.none;
-                  prf_attributes = [];
-                }))
+                  {
+                    prf_desc =
+                      Rtag
+                        ( {
+                            txt = String.capitalize_ascii name.item;
+                            loc = Location.none;
+                          },
+                          false,
+                          [
+                            generate_type
+                              ?atLoc:
+                                (match emit_locations with
+                                | true ->
+                                  Some
+                                    (conv_loc
+                                       (config.Generator_utils.map_loc name.span))
+                                | false -> None)
+                              ~config ~path:(name.item :: path) ~raw res;
+                          ] );
+                    prf_loc = Location.none;
+                    prf_attributes = [];
+                  }))
            Closed None)
       ?loc:(match emit_locations with true -> Some loc | false -> None)
       path
@@ -313,34 +313,34 @@ let generate_variant_union ~emit_locations config
     let fragment_case_tys =
       fields
       |> List.map (fun (name, res) ->
-           {
-             prf_desc =
-               Rtag
-                 ( {
-                     txt = name.item;
-                     loc =
-                       (match emit_locations with
-                       | true -> conv_loc loc
-                       | false -> Location.none);
-                   },
-                   false,
-                   [
-                     generate_type
-                       ?atLoc:
+             {
+               prf_desc =
+                 Rtag
+                   ( {
+                       txt = name.item;
+                       loc =
                          (match emit_locations with
-                         | true ->
-                           Some
-                             (conv_loc
-                                (config.Generator_utils.map_loc name.span))
-                         | false -> None)
-                       ~config ~path:(name.item :: path) ~raw res;
-                   ] );
-             prf_loc =
-               (match emit_locations with
-               | true -> conv_loc loc
-               | false -> Location.none);
-             prf_attributes = [];
-           })
+                         | true -> conv_loc loc
+                         | false -> Location.none);
+                     },
+                     false,
+                     [
+                       generate_type
+                         ?atLoc:
+                           (match emit_locations with
+                           | true ->
+                             Some
+                               (conv_loc
+                                  (config.Generator_utils.map_loc name.span))
+                           | false -> None)
+                         ~config ~path:(name.item :: path) ~raw res;
+                     ] );
+               prf_loc =
+                 (match emit_locations with
+                 | true -> conv_loc loc
+                 | false -> Location.none);
+               prf_attributes = [];
+             })
     in
     wrap_type_declaration Ptype_abstract
       ~manifest:
@@ -358,57 +358,57 @@ let generate_enum ~emit_locations _config fields path ~(loc : ast_location) raw
   wrap_type_declaration Ptype_abstract
     ~manifest:
       (if raw then base_type "string"
-      else
-        Ast_helper.Typ.variant
-          (List.append
-             (match omit_future_value with
-             | true -> []
-             | false ->
-               [
-                 {
-                   prf_desc =
-                     Rtag
-                       ( {
-                           txt = "FutureAddedValue";
-                           loc =
-                             (match emit_locations with
-                             | true -> conv_loc loc
-                             | false -> Location.none);
-                         },
-                         false,
-                         [ base_type "string" ] );
-                   prf_loc =
-                     (match emit_locations with
-                     | true -> conv_loc loc
-                     | false -> Location.none);
-                   prf_attributes = [];
-                 };
-               ])
-             (fields
-             |> List.map (fun field ->
+       else
+         Ast_helper.Typ.variant
+           (List.append
+              (match omit_future_value with
+              | true -> []
+              | false ->
+                [
                   {
                     prf_desc =
                       Rtag
                         ( {
-                            txt = to_valid_ident field;
+                            txt = "FutureAddedValue";
                             loc =
                               (match emit_locations with
                               | true -> conv_loc loc
                               | false -> Location.none);
                           },
-                          true,
-                          [] );
+                          false,
+                          [ base_type "string" ] );
                     prf_loc =
                       (match emit_locations with
                       | true -> conv_loc loc
                       | false -> Location.none);
                     prf_attributes = [];
-                  })))
-          Closed None
-        [@metaloc
-          match emit_locations with
-          | true -> conv_loc loc
-          | false -> Location.none])
+                  };
+                ])
+              (fields
+              |> List.map (fun field ->
+                     {
+                       prf_desc =
+                         Rtag
+                           ( {
+                               txt = to_valid_ident field;
+                               loc =
+                                 (match emit_locations with
+                                 | true -> conv_loc loc
+                                 | false -> Location.none);
+                             },
+                             true,
+                             [] );
+                       prf_loc =
+                         (match emit_locations with
+                         | true -> conv_loc loc
+                         | false -> Location.none);
+                       prf_attributes = [];
+                     })))
+           Closed None
+         [@metaloc
+           match emit_locations with
+           | true -> conv_loc loc
+           | false -> Location.none])
     ~loc path
 
 let generate_object_type ~emit_locations config fields obj_path raw
@@ -571,12 +571,14 @@ let generate_type_structure_items config res raw type_name fragment_name =
            ]
         :: (Schema.lookup_implementations config.schema interface_meta
            |> List.filter_map (fun (type_meta : Schema.type_meta) ->
-                match type_meta with
-                | Object { om_name } ->
-                  Some
-                    (str_type
-                       [ make_fragment_type config raw type_name om_name None ])
-                | _ -> None)))
+                  match type_meta with
+                  | Object { om_name } ->
+                    Some
+                      (str_type
+                         [
+                           make_fragment_type config raw type_name om_name None;
+                         ])
+                  | _ -> None)))
     | Some (Object _) ->
       List.append types
         [
@@ -605,12 +607,14 @@ let generate_type_signature_items (config : Generator_utils.output_config) res
            ]
         :: (Schema.lookup_implementations config.schema interface_meta
            |> List.filter_map (fun (type_meta : Schema.type_meta) ->
-                match type_meta with
-                | Object { om_name } ->
-                  Some
-                    (sig_type
-                       [ make_fragment_type config raw type_name om_name None ])
-                | _ -> None)))
+                  match type_meta with
+                  | Object { om_name } ->
+                    Some
+                      (sig_type
+                         [
+                           make_fragment_type config raw type_name om_name None;
+                         ])
+                  | _ -> None)))
     | Some (Object _) ->
       List.append types
         [
@@ -647,12 +651,12 @@ let rec generate_arg_type ?(nulls = true) raw originalLoc =
       Ast_helper.Typ.variant ?loc
         (enum_meta.em_values
         |> List.map (fun { evm_name; _ } ->
-             {
-               prf_desc =
-                 Rtag ({ txt = evm_name; loc = Location.none }, true, []);
-               prf_loc = Location.none;
-               prf_attributes = [];
-             }))
+               {
+                 prf_desc =
+                   Rtag ({ txt = evm_name; loc = Location.none }, true, []);
+                 prf_loc = Location.none;
+                 prf_attributes = [];
+               }))
         Closed None
   | Type (InputObject { iom_name }) ->
     base_type ?loc (generate_type_name ~prefix:"t_variables" [ iom_name ])
@@ -703,15 +707,15 @@ let generate_record_input_object raw input_obj_name fields =
               Ast_helper.Type.field
                 ~attrs:
                   (if valid_name = name then []
-                  else
-                    match Ppx_config.native () with
-                    | true -> []
-                    | false ->
-                      [
-                        Ast_helper.Attr.mk
-                          { txt = "bs.as"; loc = Location.none }
-                          (PStr [ Ast_helper.Str.eval (const_str_expr name) ]);
-                      ])
+                   else
+                     match Ppx_config.native () with
+                     | true -> []
+                     | false ->
+                       [
+                         Ast_helper.Attr.mk
+                           { txt = "mel.as"; loc = Location.none }
+                           (PStr [ Ast_helper.Str.eval (const_str_expr name) ]);
+                       ])
                 {
                   Location.txt = valid_name;
                   loc =

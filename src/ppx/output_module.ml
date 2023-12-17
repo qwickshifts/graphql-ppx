@@ -44,23 +44,23 @@ let pretty_print (query : string) : string =
     |> List.map (fun l -> String.trim l)
     |> List.filter (fun l -> l <> "")
     |> List.map (fun line ->
-         let prevIndent = !indent in
-         String.iter
-           (function
-             | '{' -> indent := !indent + 1
-             | '}' -> indent := !indent - 1
-             | _ -> ())
-           line;
-         let currIndent =
-           match prevIndent < !indent with
-           | true -> prevIndent
-           | false -> !indent
-         in
-         let currIndent =
-           match currIndent < 1 with true -> 1 | false -> currIndent
-         in
-         let line = String.make (currIndent * 2) ' ' ^ line in
-         line)
+           let prevIndent = !indent in
+           String.iter
+             (function
+               | '{' -> indent := !indent + 1
+               | '}' -> indent := !indent - 1
+               | _ -> ())
+             line;
+           let currIndent =
+             match prevIndent < !indent with
+             | true -> prevIndent
+             | false -> !indent
+           in
+           let currIndent =
+             match currIndent < 1 with true -> 1 | false -> currIndent
+           in
+           let line = String.make (currIndent * 2) ' ' ^ line in
+           line)
     |> String.concat "\n"
   in
   str ^ "\n"
@@ -164,12 +164,12 @@ let rec emit_json config = function
       Ast_helper.Exp.array
         (vs
         |> List.map (fun (key, value) ->
-             Ast_helper.Exp.tuple
-               [
-                 Ast_helper.Exp.constant
-                   (Pconst_string (key, Location.none, None));
-                 emit_json config value;
-               ]))
+               Ast_helper.Exp.tuple
+                 [
+                   Ast_helper.Exp.constant
+                     (Pconst_string (key, Location.none, None));
+                   emit_json config value;
+                 ]))
     in
     [%expr Js.Json.object_ (Js.Dict.fromArray [%e pairs])]
   | `List ls ->
@@ -486,29 +486,25 @@ let generate_operation_signature config variable_defs res_structure =
     match config.native with
     | true -> [ [%sigi: type t] ]
     | false ->
-      Output_types.generate_type_signature_items config
-        res_structure true None None
+      Output_types.generate_type_signature_items config res_structure true None
+        None
   in
   let types =
-    Output_types.generate_type_signature_items config res_structure
-      false None None
+    Output_types.generate_type_signature_items config res_structure false None
+      None
   in
   let raw_arg_types =
-    Output_types.generate_arg_type_signature_items true config
-      variable_defs
+    Output_types.generate_arg_type_signature_items true config variable_defs
   in
   let arg_types =
-    Output_types.generate_arg_type_signature_items false config
-      variable_defs
+    Output_types.generate_arg_type_signature_items false config variable_defs
   in
   let extracted_args = extract_args config variable_defs in
   let serialize_variable_signatures =
-    Output_serializer.generate_serialize_variable_signatures
-      extracted_args
+    Output_serializer.generate_serialize_variable_signatures extracted_args
   in
   let variable_constructor_signatures =
-    Output_serializer.generate_variable_constructor_signatures
-      extracted_args
+    Output_serializer.generate_variable_constructor_signatures extracted_args
   in
   let has_required_variables = has_required_variables extracted_args in
   [
@@ -526,17 +522,16 @@ let generate_operation_signature config variable_defs res_structure =
               | (_, Some _, _), Some return_type ->
                 return_type
               | _ -> "string")]
-          [@@ocaml.doc " The GraphQL query "]];
+        [@@ocaml.doc " The GraphQL query "]];
       [%sigi:
         val parse : Raw.t -> t
-          [@@ocaml.doc
-            " Parse the JSON-compatible GraphQL data to ReasonML data types "]];
+        [@@ocaml.doc
+          " Parse the JSON-compatible GraphQL data to ReasonML data types "]];
       [%sigi:
         val serialize : t -> Raw.t
-          [@@ocaml.doc
-            " Serialize the ReasonML GraphQL data that was parsed using the \
-             parse\n\
-             function back to the original JSON compatible data "]];
+        [@@ocaml.doc
+          " Serialize the ReasonML GraphQL data that was parsed using the parse\n\
+           function back to the original JSON compatible data "]];
     ];
     serialize_variable_signatures;
     (match variable_constructor_signatures with
@@ -602,7 +597,7 @@ let graphql_external (config : output_config) document =
            ~attrs:
              [
                Ast_helper.Attr.mk
-                 { txt = "bs.module"; loc = Location.none }
+                 { txt = "mel.module"; loc = Location.none }
                  (PStr [ Ast_helper.Str.eval (const_str_expr location) ]);
              ]
            ~prim:[ import ]
@@ -615,31 +610,29 @@ let graphql_external (config : output_config) document =
 let generate_operation_implementation config variable_defs _has_error operation
   res_structure =
   let parse_fn =
-    Output_parser.generate_parser config []
-      (Graphql_ast.Operation operation) res_structure
+    Output_parser.generate_parser config [] (Graphql_ast.Operation operation)
+      res_structure
   in
   let serialize_fn =
     Output_serializer.generate_serializer config []
       (Graphql_ast.Operation operation) None res_structure
   in
   let types =
-    Output_types.generate_type_structure_items config res_structure
-      false None None
+    Output_types.generate_type_structure_items config res_structure false None
+      None
   in
   let raw_types =
     match config.native with
     | true -> [ [%stri type t = Graphql_ppx_runtime.Json.t] ]
     | false ->
-      Output_types.generate_type_structure_items config
-        res_structure true None None
+      Output_types.generate_type_structure_items config res_structure true None
+        None
   in
   let arg_types =
-    Output_types.generate_arg_type_structure_items false config
-      variable_defs
+    Output_types.generate_arg_type_structure_items false config variable_defs
   in
   let raw_arg_types =
-    Output_types.generate_arg_type_structure_items true config
-      variable_defs
+    Output_types.generate_arg_type_structure_items true config variable_defs
   in
   let extracted_args = extract_args config variable_defs in
   let serialize_variable_functions =
@@ -711,16 +704,15 @@ let generate_fragment_signature config name variable_definitions _has_error
   (fragment : Graphql_ast.fragment Source_pos.spanning) type_name res_structure
     =
   let types =
-    Output_types.generate_type_signature_items config res_structure
-      false type_name
+    Output_types.generate_type_signature_items config res_structure false
+      type_name
       (Some (fragment.item.fg_type_condition.item, fragment.item.fg_name.span))
   in
   let raw_types =
     match config.native with
     | true -> [ [%sigi: type t] ]
     | false ->
-      Output_types.generate_type_signature_items config
-        res_structure true None
+      Output_types.generate_type_signature_items config res_structure true None
         (Some (fragment.item.fg_type_condition.item, fragment.item.fg_name.span))
   in
   let rec make_labeled_fun_sig final_type = function
@@ -734,9 +726,7 @@ let generate_fragment_signature config name variable_definitions _has_error
                prf_desc =
                  Rtag
                    ( {
-                       txt =
-                         Output_parser.generate_poly_type_ref_name
-                           type_ref;
+                       txt = Output_parser.generate_poly_type_ref_name type_ref;
                        loc = Location.none;
                      },
                      true,
@@ -797,18 +787,18 @@ let generate_fragment_signature config name variable_definitions _has_error
                 | (_, Some _, _), Some return_type ->
                   return_type
                 | _ -> "string")]
-            [@@ocaml.doc " the GraphQL fragment "]];
+          [@@ocaml.doc " the GraphQL fragment "]];
         [%sigi:
           val parse : Raw.t -> [%t type_name]
-            [@@ocaml.doc
-              " Parse the raw JSON-compatible GraphQL data into ReasonML data \
-               types "]];
+          [@@ocaml.doc
+            " Parse the raw JSON-compatible GraphQL data into ReasonML data \
+             types "]];
         [%sigi:
           val serialize : [%t type_name] -> Raw.t
-            [@@ocaml.doc
-              " Serialize the ReasonML GraphQL data that was parsed using the \
-               parse\n\
-               function back to the original JSON-compatible data "]];
+          [@@ocaml.doc
+            " Serialize the ReasonML GraphQL data that was parsed using the \
+             parse\n\
+             function back to the original JSON-compatible data "]];
         [%sigi: val verifyArgsAndParse : [%t verify_parse]];
         [%sigi: val verifyName : [%t verify_name]];
       ];
@@ -833,24 +823,23 @@ let generate_fragment_implementation config name
     Graphql_ast.variable_definitions Source_pos.spanning option) _has_error
   fragment type_name res_structure =
   let parse_fn =
-    Output_parser.generate_parser config []
-      (Graphql_ast.Fragment fragment) res_structure
+    Output_parser.generate_parser config [] (Graphql_ast.Fragment fragment)
+      res_structure
   in
   let serialize_fn =
     Output_serializer.generate_serializer config []
       (Graphql_ast.Fragment fragment) None res_structure
   in
   let types =
-    Output_types.generate_type_structure_items config res_structure
-      false type_name
+    Output_types.generate_type_structure_items config res_structure false
+      type_name
       (Some (fragment.item.fg_type_condition.item, fragment.item.fg_name.span))
   in
   let raw_types =
     match config.native with
     | true -> [ [%stri type t = Graphql_ppx_runtime.Json.t] ]
     | false ->
-      Output_types.generate_type_structure_items config
-        res_structure true None
+      Output_types.generate_type_structure_items config res_structure true None
         (Some (fragment.item.fg_type_condition.item, fragment.item.fg_name.span))
   in
   let rec make_labeled_fun body = function
@@ -867,8 +856,7 @@ let generate_fragment_implementation config name
                     Rtag
                       ( {
                           txt =
-                            Output_parser
-                            .generate_poly_type_ref_name type_ref;
+                            Output_parser.generate_poly_type_ref_name type_ref;
                           loc = Location.none;
                         },
                         true,
@@ -1011,22 +999,22 @@ let generate_modules module_name module_type operations =
     let contents =
       operations
       |> List.map (fun (operation, config) ->
-           (generate_definition config operation, config))
+             (generate_definition config operation, config))
       |> List.mapi
            (fun i (((definition, name, contents, loc), signature), config) ->
-           let module_type =
-             match module_type with
-             | Some module_type -> module_type
-             | None -> Ast_helper.Mty.mk (Pmty_signature signature)
-           in
-           match name with
-           | Some name ->
-             wrap_query_module ~loc ~module_type definition (Some name) contents
-               config
-           | None ->
-             wrap_query_module ~loc ~module_type definition
-               (Some ("Untitled" ^ string_of_int i))
-               contents config)
+             let module_type =
+               match module_type with
+               | Some module_type -> module_type
+               | None -> Ast_helper.Mty.mk (Pmty_signature signature)
+             in
+             match name with
+             | Some name ->
+               wrap_query_module ~loc ~module_type definition (Some name)
+                 contents config
+             | None ->
+               wrap_query_module ~loc ~module_type definition
+                 (Some ("Untitled" ^ string_of_int i))
+                 contents config)
       |> List.concat
     in
     match module_name with
@@ -1052,16 +1040,16 @@ let generate_module_interfaces module_name operations =
     let contents =
       operations
       |> List.map (fun (operation, config) ->
-           (generate_definition config operation, config))
+             (generate_definition config operation, config))
       |> List.mapi (fun i (((definition, name, _, _), signature), config) ->
-           match name with
-           | Some name ->
-             wrap_query_module_signature ~signature definition (Some name)
-               config
-           | None ->
-             wrap_query_module_signature ~signature definition
-               (Some ("Untitled" ^ string_of_int i))
-               config)
+             match name with
+             | Some name ->
+               wrap_query_module_signature ~signature definition (Some name)
+                 config
+             | None ->
+               wrap_query_module_signature ~signature definition
+                 (Some ("Untitled" ^ string_of_int i))
+                 config)
       |> List.concat
     in
     match module_name with
