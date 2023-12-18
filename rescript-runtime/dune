@@ -3,6 +3,5 @@
  (name graphql_ppx_runtime)
  (libraries json)
  (modes melange)
- (wrapped false)
  (preprocess
   (pps melange.ppx)))
