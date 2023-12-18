@@ -4,6 +4,5 @@
  (name json)
  (public_name graphql_ppx.json)
  (modes native melange)
- (wrapped false)
  (flags
   (:standard -w -9)))
