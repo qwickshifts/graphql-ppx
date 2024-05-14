@@ -12,29 +12,33 @@ let clone =
 let rec deepMerge (json1 : Js.Json.t) (json2 : Js.Json.t) =
   match
     ( ( Obj.magic json1 = Js.null,
-        Js.Array2.isArray json1,
+        Js.Array.isArray json1,
         Js.typeof json1 = "object" ),
       ( Obj.magic json2 = Js.null,
-        Js.Array2.isArray json2,
+        Js.Array.isArray json2,
         Js.typeof json2 = "object" ) )
   with
   | (_, true, _), (_, true, _) ->
     (Obj.magic
-       (Js.Array2.mapi (Obj.magic json1) (fun el1 idx ->
-            let el2 = Js.Array2.unsafe_get (Obj.magic json2) idx in
+       (Js.Array.mapi
+          ~f:(fun el1 idx ->
+            let el2 = Js.Array.unsafe_get (Obj.magic json2) idx in
             match Js.typeof el2 = "object" with
             | true -> deepMerge el1 el2
-            | false -> el2))
+            | false -> el2)
+          (Obj.magic json1))
       : Js.Json.t)
   | (false, false, true), (false, false, true) ->
     let obj1 = clone (Obj.magic json1) in
     let obj2 = Obj.magic json2 in
-    Js.Array2.forEach (Js.Dict.keys obj2) (fun key ->
+    Js.Array.forEach
+      ~f:(fun key ->
         let existingVal = (Js.Dict.unsafeGet obj1 key : Js.Json.t) in
         let newVal = (Js.Dict.unsafeGet obj2 key : Js.Json.t) in
         Js.Dict.set obj1 key
           (match Js.typeof existingVal <> "object" with
           | true -> newVal
-          | false -> Obj.magic (deepMerge existingVal newVal)));
+          | false -> Obj.magic (deepMerge existingVal newVal)))
+      (Js.Dict.keys obj2);
     Obj.magic obj1
   | (_, _, _), (_, _, _) -> json2
