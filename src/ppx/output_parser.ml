@@ -178,7 +178,7 @@ and generate_array_decoder config loc inner path definition =
     [@metaloc loc]
   | false ->
     [%expr
-      Js.Array2.map value (fun value ->
+      Js.Array.map value ~f:(fun value ->
           [%e generate_parser config path definition inner])]
     [@metaloc loc]
 

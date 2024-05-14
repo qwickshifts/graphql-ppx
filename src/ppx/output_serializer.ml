@@ -92,7 +92,7 @@ let rec serialize_type = function
           `List
             (Array.map (fun b -> [%e serialize_type inner] b) a |> Array.to_list)]
     | false ->
-      [%expr fun a -> Js.Array2.map a (fun b -> [%e serialize_type inner] b)])
+      [%expr fun a -> Js.Array.map a ~f:(fun b -> [%e serialize_type inner] b)])
   | Type (Object _) -> [%expr fun v -> None]
   | Type (Union _) -> [%expr fun v -> None]
   | Type (Interface _) -> [%expr fun v -> None]
@@ -369,7 +369,7 @@ and generate_array_encoder config loc inner path definition =
     [@metaloc loc]
   | false ->
     [%expr
-      Js.Array2.map value (fun value ->
+      Js.Array.map value ~f:(fun value ->
           [%e generate_serializer config path definition None inner])]
     [@metaloc loc]
 
@@ -573,7 +573,7 @@ and generate_object_encoder config loc _name fields path definition
     | false ->
       [%expr
         (Obj.magic
-           (Js.Array2.reduce
+           (Js.Array.reduce
               [%e fields |> Ast_helper.Exp.array]
               Graphql_ppx_runtime.deepMerge
               (Obj.magic [%e do_obj_constructor ()] : Js.Json.t))
